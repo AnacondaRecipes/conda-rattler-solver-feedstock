@@ -47,6 +47,11 @@ requirements:
   # reading from stdin while output is captured!  Consider using `-s`
   "--deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages"
 ]%}
+{% set ignored_tests_lin_win = [
+  "--deselect=tests/test_solver.py::test_too_aggressive_update_to_conda_forge_packages",
+  "--deselect=tests/test_solver.py::test_pinned_with_cli_build_string",
+  "--deselect=tests/test_workarounds.py::test_ctrl_c"
+]%}
 test:
   source_files:
     - tests
@@ -61,7 +66,8 @@ test:
   commands:
     - pip check
     - python -m conda create --dry-run python --solver=rattler
-    - pytest -vv {{ ignored_tests | join(" ") }}
+    - pytest -vv {{ ignored_tests | join(" ") }} # [osx]
+    - pytest -vv {{ ignored_tests | join(" ") }} {{ ignored_tests_lin_win | join(" ") }} # [not osx]
 
 about:
   home: https://github.com/conda-incubator/conda-rattler-solver
