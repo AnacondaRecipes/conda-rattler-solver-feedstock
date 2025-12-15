@@ -1,0 +1,82 @@
+{% set name = "conda-rattler-solver" %}
+{% set version = "0.0.3" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://github.com/conda-incubator/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
+  sha256: 173508c029fe07ec0741a00009244988bd6d65f62f486739727b4a641f76750f
+
+build:
+  skip: true # [py<38]
+  number: 0
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
+
+requirements:
+  host:
+    - python
+    - hatchling
+    - hatch-vcs
+    - pip
+  run:
+    - python
+    - conda >=25.3.0
+    - py-rattler >=0.13.1
+
+{% set ignored_tests = [
+  "--ignore=tests/test_downstream.py",
+  "--ignore=tests/test_performance.py",
+  # FileNotFoundError: [Errno 2] No such file or directory: '$PREFIX/lib/python3.10/site-packages/tests/data/index.json'
+  "--deselect=tests/test_solver.py::TestRattlerSolver::test_timestamps_and_deps",
+  "--deselect=tests/test_solver.py::TestRattlerSolver::test_nonexistent_deps",
+  "--deselect=tests/test_solver.py::TestRattlerSolver::test_install_package_with_feature",
+  "--deselect=tests/test_solver.py::TestRattlerSolver::test_circular_dependencies",
+  "--deselect=tests/test_solver.py::TestRattlerSolver::test_irrational_version",
+  "--deselect=tests/test_solver.py::TestRattlerSolver::test_anaconda_nomkl",
+  "--deselect=tests/test_solver.py::TestRattlerSolver::test_unsat_from_r1",
+  "--deselect=tests/test_solver.py::TestRattlerSolver::test_get_dists",
+  "--deselect=tests/test_solver.py::TestRattlerSolver::test_empty",
+  # AssertionError: assert 'pkgs/main' == 'conda-forge'
+  "--deselect=tests/test_channels.py::test_channel_matchspec",
+  "--deselect=tests/test_channels.py::test_conda_build_with_aliased_channels",
+  "--deselect=tests/test_channels.py::test_unknown_channels_do_not_crash",
+  "--deselect=tests/test_solver.py::TestRattlerSolver::test_noarch_preferred_over_arch_when_build_greater_dep",
+  "--deselect=tests/test_solver.py::test_python_downgrade_with_pins_removes_truststore",
+  # reading from stdin while output is captured!  Consider using `-s`
+  "--deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages"
+]%}
+test:
+  source_files:
+    - tests
+    - pyproject.toml
+  imports:
+    - conda_rattler_solver.solver
+  requires:
+    - pip
+    - pytest
+    - pytest-xprocess
+    - conda-index
+  commands:
+    - pip check
+    - python -m conda create --dry-run python --solver=rattler
+    - pytest -vv {{ ignored_tests | join(" ") }}
+
+about:
+  home: https://github.com/conda-incubator/conda-rattler-solver
+  summary: The fast pixi solver, now in conda
+  description: |
+    If conda-libmamba-solver brought the mamba solver to conda, conda-rattler-solver tries to
+    integrate the pixi solver (called resolvo, as provided in rattler) in conda.
+    This is an experiment to see how easy it would be to integrate new solves in
+    conda after the initial work done in conda-libmamba-solver.
+  license: BSD-3-Clause
+  license_family: BSD
+  license_file: LICENSE
+  dev_url: https://github.com/conda-incubator/conda-rattler-solver
+  doc_url: https://github.com/conda-incubator/conda-rattler-solver/blob/main/README.md
+
+extra:
+  recipe-maintainers:
+    - jaimergp
