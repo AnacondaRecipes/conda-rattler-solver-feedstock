@@ -10,7 +10,7 @@ source:
   sha256: b983a030495aed46ab7ab01706719f1b7cf12d3995a4d2a6e9e6fc91087e9934
 
 build:
-  number: 0
+  number: 1
   skip: true  # [py<310]
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
@@ -25,11 +25,12 @@ requirements:
     - conda >=25.5.0
     - py-rattler >=0.21.0
 
+{% set deselect_tests = "" %}
 {% set deselect_tests = " --deselect=tests/test_channels.py::test_conda_build_with_aliased_channels" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_unknown_channels_do_not_crash" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_downstream.py::test_build_recipe" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_downstream.py::test_conda_lock" %}
- # Tests hang on this one
+# Tests hang on this one
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_performance.py::test_install_vaex_from_conda_forge_and_defaults" %}
 # FileNotFoundError: [Errno 2] No such file or directory: '$PREFIX/lib/python3.11/site-packages/tests/data/index.json'
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_empty" %}
