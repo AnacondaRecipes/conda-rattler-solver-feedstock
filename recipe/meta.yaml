@@ -26,7 +26,7 @@ requirements:
     - py-rattler >=0.21.0
 
 {% set deselect_tests = "" %}
-{% set deselect_tests = " --deselect=tests/test_channels.py::test_conda_build_with_aliased_channels" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_conda_build_with_aliased_channels" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_unknown_channels_do_not_crash" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_downstream.py::test_build_recipe" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_downstream.py::test_conda_lock" %}
