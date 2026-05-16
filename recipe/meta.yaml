@@ -1,16 +1,16 @@
 {% set name = "conda-rattler-solver" %}
-{% set version = "0.0.6" %}
+{% set version = "0.1.0" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://github.com/conda-incubator/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-  sha256: eb44acb0f550c9765f31ab5716380ed7b7e9c93cd6cd9612ba3ccf85c978385c
+  url: https://github.com/conda/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
+  sha256: b14a5b952bd96542c68883b6ab890a43b53890785580e730d9fc55d26c53e8d6
 
 build:
-  number: 1
+  number: 0
   skip: true  # [py<310]
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
@@ -22,7 +22,7 @@ requirements:
     - hatch-vcs
   run:
     - python
-    - conda >=25.5.0
+    - conda >=26.5.0
     - py-rattler >=0.23.0,<0.24.0a0
 
 {% set deselect_tests = "" %}
@@ -84,7 +84,7 @@ test:
     - pytest -vv tests {{ deselect_tests }}
 
 about:
-  home: https://github.com/conda-incubator/conda-rattler-solver
+  home: https://github.com/conda/conda-rattler-solver
   summary: The fast pixi solver, now in conda
   description: |
     If conda-libmamba-solver brought the mamba solver to conda, conda-rattler-solver tries to
@@ -94,8 +94,8 @@ about:
   license: BSD-3-Clause
   license_family: BSD
   license_file: LICENSE
-  dev_url: https://github.com/conda-incubator/conda-rattler-solver
-  doc_url: https://github.com/conda-incubator/conda-rattler-solver/blob/main/README.md
+  dev_url: https://github.com/conda/conda-rattler-solver
+  doc_url: https://github.com/conda/conda-rattler-solver/blob/main/README.md
 
 extra:
   recipe-maintainers:
