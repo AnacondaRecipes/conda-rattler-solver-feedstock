@@ -1,5 +1,5 @@
 {% set name = "conda-rattler-solver" %}
-{% set version = "0.1.0" %}
+{% set version = "0.1.1" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/conda/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-  sha256: b14a5b952bd96542c68883b6ab890a43b53890785580e730d9fc55d26c53e8d6
+  sha256: 5bb558d6d125d5312886e3d98ce592105679e37d44ec78bfb8ace8c114d78b6e
 
 build:
   number: 0
@@ -23,7 +23,7 @@ requirements:
   run:
     - python
     - conda >=26.5.0
-    - py-rattler >=0.23.0,<0.24.0a0
+    - py-rattler >=0.25.0,<0.26.0a0
 
 {% set deselect_tests = "" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_conda_build_with_aliased_channels" %}
@@ -66,6 +66,8 @@ requirements:
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_too_aggressive_update_to_conda_forge_packages" %}  # [linux]
 # conda_rattler_solver.exceptions.RattlerUnsatisfiableError: Cannot solve the request because of: The following packages are incompatible
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pinned_with_cli_build_string" %}  # [linux]
+# py-rattler 0.25: noarch pip not reinstalled on py downgrade; pip 26.x needs py>=3.10 (dataclass slots)
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages" %}
 
 test:
   source_files:
@@ -89,8 +91,8 @@ about:
   description: |
     If conda-libmamba-solver brought the mamba solver to conda, conda-rattler-solver tries to
     integrate the pixi solver (called resolvo, as provided in rattler) in conda.
-    This is an experiment to see how easy it would be to integrate new solves in
-    conda after the initial work done in conda-libmamba-solver.
+    Environments solve meaningfully faster with Rattler, especially large or complex ones, and
+    your existing environments and workflows keep working.
   license: BSD-3-Clause
   license_family: BSD
   license_file: LICENSE
@@ -99,4 +101,5 @@ about:
 
 extra:
   recipe-maintainers:
+    - danyeaw
     - jaimergp
