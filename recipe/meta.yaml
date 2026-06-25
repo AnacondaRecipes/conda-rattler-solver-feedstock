@@ -66,6 +66,8 @@ requirements:
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_too_aggressive_update_to_conda_forge_packages" %}  # [linux]
 # conda_rattler_solver.exceptions.RattlerUnsatisfiableError: Cannot solve the request because of: The following packages are incompatible
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pinned_with_cli_build_string" %}  # [linux]
+# py-rattler 0.25: noarch pip not reinstalled on py downgrade; pip 26.x needs py>=3.10 (dataclass slots)
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages" %}
 
 test:
   source_files:
