@@ -103,7 +103,10 @@ test:
   commands:
     - pip check
     - python -m conda create --dry-run python --solver=rattler
-    - pytest -vv tests {{ deselect_tests }}
+    # NOTE: keep this line double-quoted. conda-build's selector regex treats any
+    # line ending in [...] as a platform selector, so an unquoted command ending in
+    # a parametrized deselect (e.g. ...shards[shard-small]) would be silently dropped.
+    - "pytest -vv tests {{ deselect_tests }}"
 
 about:
   home: https://github.com/conda/conda-rattler-solver
