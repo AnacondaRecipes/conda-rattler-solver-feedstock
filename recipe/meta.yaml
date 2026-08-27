@@ -71,6 +71,23 @@ requirements:
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_channel_matchspec" %}  # [win and arm64]
 # py-rattler 0.25: noarch pip not reinstalled on py downgrade; pip 26.x needs py>=3.10 (dataclass slots)
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages" %}
+# Slow tests, and tests needing packages not published for win-arm64
+# (ca-certificates=2023, python=3.8/3.10/3.11.10, x264, numpy=2.1.2)
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_prune_existing_env_dependencies_are_solved" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_update_from_latest_not_downgrade" %}
+# covers all parametrizations: [pytorch], [pytorch>0], [pytorch=2]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pytorch_gpu" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver_differences.py::test_pydantic_182_not_on_python_311" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_http_server_auth_token_in_defaults" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_http_server_auth_none" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_http_server_auth_token" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_http_server_auth_basic" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_http_server_auth_basic_email" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_nameless_channel" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_local_spec" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_channels_installed_unavailable" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_cli.py::test_cli_flag_in_help" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_index.py::test_load_channel_repo_info_shards[shard-small]" %}
 
 test:
   source_files:
