@@ -27,11 +27,12 @@ requirements:
 
 {% set deselect_tests = "" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_conda_build_with_aliased_channels" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_unknown_channels_do_not_crash" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_downstream.py::test_build_recipe" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_downstream.py::test_conda_lock" %}
-# Tests hang on this one
+# Tests hang on these ones
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_performance.py::test_install_vaex_from_conda_forge_and_defaults" %}
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver_differences.py::test_gpu_cpu_mutexes" %}  # [linux]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver_differences.py::test_old_panel" %}  # [linux]
 # FileNotFoundError: [Errno 2] No such file or directory: '$PREFIX/lib/python3.11/site-packages/tests/data/index.json'
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_empty" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_anaconda_nomkl" %}
@@ -42,32 +43,24 @@ requirements:
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_install_package_with_feature" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_circular_dependencies" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_irrational_version" %}
-# OSError: invalid archive identifier 'b-1.0-0': invalid archive identifier
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_unsat_simple" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_unsat_shortest_chain_1" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_unsat_shortest_chain_2" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_unsat_shortest_chain_3" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_unsat_shortest_chain_4" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_unsat_chain" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_unsat_any_two_not_three" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_unsat_expand_single" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_unsat_missing_dep" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_get_reduced_index_broadening_with_unsatisfiable_early_dep" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_get_reduced_index_broadening_preferred_solution" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_arch_preferred_over_noarch_when_otherwise_equal" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_noarch_preferred_over_arch_when_version_greater" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_noarch_preferred_over_arch_when_version_greater_dep" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_noarch_preferred_over_arch_when_build_greater" %}
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_noarch_preferred_over_arch_when_build_greater_dep" %}
-# Linux hanging on this ones
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver_differences.py::test_gpu_cpu_mutexes" %}  # [linux]
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver_differences.py::test_old_panel" %}  # [linux]
-# AssertionError: assert 116 <= 1
+# AssertionError
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_too_aggressive_update_to_conda_forge_packages" %}  # [linux]
-# conda_rattler_solver.exceptions.RattlerUnsatisfiableError: Cannot solve the request because of: The following packages are incompatible
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pinned_with_cli_build_string" %}  # [linux]
-# py-rattler 0.25: noarch pip not reinstalled on py downgrade; pip 26.x needs py>=3.10 (dataclass slots)
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages" %}
+# LibMambaUnsatisfiableError: Encountered problems while solving: package pandas-1.2.5-py37h295c915_0 is excluded by strict repo priority
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pinned_with_cli_build_string " %}  # [linux64]
+# RattlerUnsatisfiableError: Cannot solve the request because of: The following packages are incompatible - python_abi 3.6 | 3.7
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solve_comparison_benchmarks.py::test_solve_update_all_large_lockfile" %}
+# Unavailable packages on the win-arm64 channel
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_channel_matchspec" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_repoquery.py::test_query_search" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_determinism" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_constraining_pin_and_requested" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_ca_certificates_pins" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_update_should_not_uninstall_history" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_downgrade_with_pins_removes_truststore" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_urls_are_percent_decoded" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_prune_existing_env_dependencies_are_solved" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_does_not_change_unless_wanted" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages" %}  # [win and arm64]
 
 test:
   source_files:
