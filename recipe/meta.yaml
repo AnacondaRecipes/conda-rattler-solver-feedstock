@@ -79,6 +79,7 @@ test:
     - pip
     - pytest
     - pytest-xprocess
+    - pytest-benchmark
     - conda-index
   commands:
     - pip check
