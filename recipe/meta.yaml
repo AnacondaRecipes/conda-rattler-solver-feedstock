@@ -74,6 +74,7 @@ test:
     - pytest-xprocess
     - pytest-benchmark
     - conda-index
+    - nvidia-virtual-packages
   commands:
     - pip check
     - python -m conda create --dry-run python --solver=rattler
