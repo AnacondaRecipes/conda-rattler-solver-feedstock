@@ -61,6 +61,8 @@ requirements:
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_prune_existing_env_dependencies_are_solved" %}  # [win and arm64]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_does_not_change_unless_wanted" %}  # [win and arm64]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages" %}  # [win and arm64]
+# Require nvidia-virtual-packages which aren't on main
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pytorch_gpu" %}
 
 test:
   source_files:
@@ -74,7 +76,6 @@ test:
     - pytest-xprocess
     - pytest-benchmark
     - conda-index
-    - nvidia-virtual-packages
   commands:
     - pip check
     - python -m conda create --dry-run python --solver=rattler
