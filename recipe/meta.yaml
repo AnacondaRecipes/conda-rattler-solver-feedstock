@@ -11,7 +11,7 @@ source:
 
 build:
   number: 0
-  skip: true  # [py<310]
+  skip: true  # [py<310 or (win and arm64 and py<312)]
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
@@ -61,6 +61,9 @@ requirements:
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_prune_existing_env_dependencies_are_solved" %}  # [win and arm64]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_does_not_change_unless_wanted" %}  # [win and arm64]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages" %}  # [win and arm64]
+# Python 3.10 and 3.11 are not available on win-arm64
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_defaults_specs_work" %}  # [win and arm64]
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_add_pip_as_python_dependency" %}  # [win and arm64]
 # Requires nvidia-virtual-packages which aren't on main
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pytorch_gpu" %}
 
@@ -81,6 +84,7 @@ test:
     - python -m conda create --dry-run python --solver=rattler
     # Some solver tests assume conda's default flexible channel priority, but
     # some build workers configure strict priority, so pin it for the test run.
+    # https://github.com/AnacondaRecipes/conda-rattler-solver-feedstock/pull/9
     - export CONDA_CHANNEL_PRIORITY=flexible  # [unix]
     - set "CONDA_CHANNEL_PRIORITY=flexible"  # [win]
     - pytest -vv tests {{ deselect_tests }}
