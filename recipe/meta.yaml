@@ -61,8 +61,6 @@ requirements:
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_prune_existing_env_dependencies_are_solved" %}  # [win and arm64]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_does_not_change_unless_wanted" %}  # [win and arm64]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages" %}  # [win and arm64]
-# These assume flexible channel priority; the macOS arm64 workers run with strict priority
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_install_keeps_unrequested_history_packages" %}  # [osx and arm64]
 # Requires nvidia-virtual-packages which aren't on main
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pytorch_gpu" %}
 
@@ -81,6 +79,10 @@ test:
   commands:
     - pip check
     - python -m conda create --dry-run python --solver=rattler
+    # Some solver tests assume conda's default flexible channel priority, but
+    # some build workers configure strict priority, so pin it for the test run.
+    - export CONDA_CHANNEL_PRIORITY=flexible  # [unix]
+    - set "CONDA_CHANNEL_PRIORITY=flexible"  # [win]
     - pytest -vv tests {{ deselect_tests }}
 
 about:
