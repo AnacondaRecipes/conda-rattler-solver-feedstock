@@ -18,8 +18,8 @@ requirements:
   host:
     - pip
     - python
-    - hatchling
-    - hatch-vcs
+    - hatchling >=1.12.2
+    - hatch-vcs >0.2.0
   run:
     - python
     - conda >=26.7.0
