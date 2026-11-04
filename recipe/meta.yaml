@@ -1,5 +1,5 @@
 {% set name = "conda-rattler-solver" %}
-{% set version = "26.10.1" %}
+{% set version = "26.10.2" %}
 
 package:
   name: {{ name|lower }}
@@ -7,30 +7,33 @@ package:
 
 source:
   url: https://github.com/conda/{{ name }}/archive/{{ version }}.tar.gz
-  sha256: 0098248f5c6d4ad7e31ac0ae5376b97e161f7ef2db240e21f4c467283ec7c134
+  sha256: d867afc4a9662855a14ececde71e9e2a79ae1a9870711ea7223e80ce5fdd525c
 
 build:
   number: 0
-  skip: true  # [py<310 or (win and arm64 and py<312)]
+  skip: true  # [py<310]
   script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
 
 requirements:
   host:
     - pip
     - python
-    - hatchling
-    - hatch-vcs
+    - hatchling >=1.12.2
+    - hatch-vcs >0.2.0
   run:
     - python
     - conda >=26.7.0
     - py-rattler >=0.28.1,<0.29.0a0
 
 {% set deselect_tests = "" %}
+# Nested conda-build tests are unreliable in the build workers' test environments.
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_conda_build_with_aliased_channels" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_downstream.py::test_build_recipe" %}
+# Deselect conda-lock tests
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_downstream.py::test_conda_lock" %}
-# Tests hang on these ones
+# vaex and vaex-core are not available on defaults on any platform
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_performance.py::test_install_vaex_from_conda_forge_and_defaults" %}
+# Tests hang on these ones
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver_differences.py::test_gpu_cpu_mutexes" %}  # [linux]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver_differences.py::test_old_panel" %}  # [linux]
 # FileNotFoundError: [Errno 2] No such file or directory: '$PREFIX/lib/python3.11/site-packages/tests/data/index.json'
@@ -43,13 +46,11 @@ requirements:
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_install_package_with_feature" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_circular_dependencies" %}
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::TestRattlerSolver::test_irrational_version" %}
-# AssertionError
+# AssertionError: too many packages updated (linux only)
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_too_aggressive_update_to_conda_forge_packages" %}  # [linux]
-# LibMambaUnsatisfiableError: Encountered problems while solving: package pandas-1.2.5-py37h295c915_0 is excluded by strict repo priority
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pinned_with_cli_build_string " %}  # [linux64]
-# RattlerUnsatisfiableError: Cannot solve the request because of: The following packages are incompatible - python_abi 3.6 | 3.7
+# RattlerUnsatisfiableError: Cannot solve the request because of: The following packages are incompatible - python_abi 3.6 | 3.7 (linux-64 only)
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solve_comparison_benchmarks.py::test_solve_update_all_large_lockfile" %}
-# Unavailable packages on the win-arm64 channel
+# Unavailable packages for win-arm64
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_channels.py::test_channel_matchspec" %}  # [win and arm64]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_repoquery.py::test_query_search" %}  # [win and arm64]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_determinism" %}  # [win and arm64]
@@ -61,11 +62,13 @@ requirements:
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_prune_existing_env_dependencies_are_solved" %}  # [win and arm64]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_does_not_change_unless_wanted" %}  # [win and arm64]
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_python_downgrade_reinstalls_noarch_packages" %}  # [win and arm64]
-# Python 3.10 and 3.11 are not available on win-arm64
+# Python 3.10 and 3.11 are not available for win-arm64
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_defaults_specs_work" %}  # [win and arm64]
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_add_pip_as_python_dependency" %}  # [win and arm64]
-# Requires nvidia-virtual-packages which aren't on main
+# This test explicitly requires nvidia_virtual_packages for __cuda_arch.
+# 'nvidia-virtual-packages' is not available in the main channel.
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pytorch_gpu" %}
+# Uses the tmp_repodata_channel fixture, which is not available until conda 26.10.0 (all platforms)
+{% set deselect_tests = deselect_tests + " --deselect=tests/test_pip_interop.py" %}
 
 test:
   source_files:
@@ -87,6 +90,10 @@ test:
     # https://github.com/AnacondaRecipes/conda-rattler-solver-feedstock/pull/9
     - export CONDA_CHANNEL_PRIORITY=flexible  # [unix]
     - set "CONDA_CHANNEL_PRIORITY=flexible"  # [win]
+    # Run the solver-parametrized performance tests against rattler, the
+    # solver under test.
+    - export CONDA_TEST_SOLVERS=rattler  # [unix]
+    - set "CONDA_TEST_SOLVERS=rattler"  # [win]
     - pytest -vv tests {{ deselect_tests }}
 
 about:
