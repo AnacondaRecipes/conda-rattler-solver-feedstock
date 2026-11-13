@@ -67,8 +67,6 @@ requirements:
 # This test explicitly requires nvidia_virtual_packages for __cuda_arch.
 # 'nvidia-virtual-packages' is not available in the main channel.
 {% set deselect_tests = deselect_tests + " --deselect=tests/test_solver.py::test_pytorch_gpu" %}
-# Uses the tmp_repodata_channel fixture, which is not available until conda 26.10.0 (all platforms)
-{% set deselect_tests = deselect_tests + " --deselect=tests/test_pip_interop.py" %}
 
 test:
   source_files:
